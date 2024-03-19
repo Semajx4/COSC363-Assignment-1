@@ -6,14 +6,94 @@
 //  ========================================================================
 
 #include <cmath>
+#include <iostream>
 #include <GL/freeglut.h>
 #include "spaceModels.h"
+#include "loadTGA.h"
+using namespace std;
+GLuint txId[2];   //Texture ids
+
 
 //--------------- GROUND PLANE ----------------------------------------
 // This is a square shaped region on the xz-plane of size 400x400 units
 // centered at the origin.  This region is constructed using small quads
 // of unit size, to facilitate rendering of spotlights
 //---------------------------------------------------------------------
+
+
+void loadTexture()				
+{
+	glGenTextures(2, txId); 	// Create 2 texture ids
+
+	glBindTexture(GL_TEXTURE_2D, txId[0]);  //Use this texture
+    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Sky.tga");
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
+
+	
+	glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
+}
+
+void walls()
+{
+	glBindTexture(GL_TEXTURE_2D, txId[0]);   //replace with a texture
+	glBegin(GL_QUADS);
+
+	////////////////////// BACK WALL ///////////////////////
+		glTexCoord2f(0.0f,2.0f);
+		glVertex3f(-15, 1, -15);
+
+		glTexCoord2f(0.0f,0.0f);
+		glVertex3f(-15, -1, -15);
+
+		glTexCoord2f(12.0f,0.0f);
+		glVertex3f(15, -1, -15);
+
+		glTexCoord2f(12.0f,2.0f);
+		glVertex3f(15, 1, -15);
+
+		////////////////////// FRONT WALL ///////////////////////
+		glTexCoord2f(0.0f,2.0f);
+		glVertex3f(-15, 1, 15);
+
+		glTexCoord2f(0.0f,0.0f);
+		glVertex3f(-15, -1, 15);
+
+		glTexCoord2f(12.0f,0.0f);
+		glVertex3f(15, -1, 15);
+
+		glTexCoord2f(12.0f,2.0f);
+		glVertex3f(15, 1, 15);
+
+		////////////////////// LEFT WALL ///////////////////////
+		glTexCoord2f(0.0f,2.0f);
+		glVertex3f(-15, 1, -15);
+
+		glTexCoord2f(0.0f,0.0f);
+		glVertex3f(-15, -1, -15);
+
+		glTexCoord2f(12.0f,0.0f);
+		glVertex3f(-15, -1, 15);
+
+		glTexCoord2f(12.0f,2.0f);
+		glVertex3f(-15, 1, 15);
+
+		////////////////////// RIGHT WALL ///////////////////////
+
+		glTexCoord2f(0.0f,2.0f);
+		glVertex3f(15, 1, -15);
+
+		glTexCoord2f(0.0f,0.0f);
+		glVertex3f(15, -1, -15);
+
+		glTexCoord2f(12.0f,0.0f);
+		glVertex3f(15, -1, 15);
+
+		glTexCoord2f(12.0f,2.0f);
+		glVertex3f(15, 1, 15);
+
+	glEnd();
+}
 void floor()
 {
 	float white[4] = {1, 1, 1, 1};

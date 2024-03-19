@@ -79,13 +79,19 @@ void display(void)
     float spotPosn[] = {-18,14,0,1};
     glClear (GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-
-    //gluLookAt (-80, 80, 250, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-    gluLookAt(eye_x, 10, eye_z,  look_x, 0, look_z,   0, 1, 0);	
+    	glLoadIdentity();
 
     
 
+    //gluLookAt (-80, 80, 250, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt(eye_x, 10, eye_z,  look_x, 0, look_z,   0, 1, 0);	
+    
+    glPushMatrix();
+    glTranslatef(0,5,0);
+        walls();
+    glPopMatrix();
+
+    //;glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
         glRotatef(angle,0,1,0);
         
