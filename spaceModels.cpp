@@ -1,116 +1,217 @@
 //  ========================================================================
-//  COSC363: Computer Graphics (2024);  University of Canterbury.
+//  COSC363: Computer Graphics (2024);  James Suddaby
 //
-//  RailModels.cpp
-//  A collection of functions for generating the models for a railway scene
+//  RspaceModels.cpp
+//  A collection of functions for generating the models for an alien scene
 //  ========================================================================
 
 #include <cmath>
 #include <iostream>
+#include <vector>
 #include <GL/freeglut.h>
+#include <GL/gl.h>
+
 #include "spaceModels.h"
 #include "loadTGA.h"
 using namespace std;
-GLuint txId[2];   //Texture ids
-
-
-//--------------- GROUND PLANE ----------------------------------------
-// This is a square shaped region on the xz-plane of size 400x400 units
-// centered at the origin.  This region is constructed using small quads
-// of unit size, to facilitate rendering of spotlights
-//---------------------------------------------------------------------
-
+GLuint txId[10];   //Texture ids
 
 void loadTexture()				
 {
-	glGenTextures(2, txId); 	// Create 2 texture ids
+	glGenTextures(10, txId); 	// Create 2 texture ids
 
 	glBindTexture(GL_TEXTURE_2D, txId[0]);  //Use this texture
-    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Sky.tga");
+    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/EquiRectangular4.tga");
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
+	
+	glBindTexture(GL_TEXTURE_2D, txId[1]);  //Use this texture
+    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Floor.tga");
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
 
+
+//----------------------------------------------------------------------------------------
+	//Textures for all six sides of the sky box:
+
 	
+	glBindTexture(GL_TEXTURE_2D, txId[2]);  //Use this texture
+	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Back.tga");
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
+	
+	glBindTexture(GL_TEXTURE_2D, txId[3]);  //Use this texture
+	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Front.tga");
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
+	
+	glBindTexture(GL_TEXTURE_2D, txId[4]);  //Use this texture
+	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Down.tga");
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
+	
+	glBindTexture(GL_TEXTURE_2D, txId[5]);  //Use this texture
+	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Up.tga");
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
+	
+	glBindTexture(GL_TEXTURE_2D, txId[6]);  //Use this texture
+	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Left.tga");
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	glBindTexture(GL_TEXTURE_2D, txId[7]);  //Use this texture
+	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Right.tga");
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+//----------------------------------------------------------------------
+
+
+	glBindTexture(GL_TEXTURE_2D, txId[8]);  //Use this texture
+    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/ship_texture.tga");
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
+
+	glBindTexture(GL_TEXTURE_2D, txId[9]);  //Use this texture
+    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/glass_texture1.tga");
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+
 	glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
 }
 
-void walls()
+//A sky dome surface of revolution
+void skyDome(const std::vector<Vertex>& vertices, int slices, int stacks)
+{
+	glBindTexture(GL_TEXTURE_2D, txId[0]);   //replace with a texture
+	for(int i=0; i< stacks; ++i){
+		glBegin(GL_QUAD_STRIP);
+		for(int j=0; j <= slices; ++j){
+			int index1 = i*(slices + 1) + j;
+			int index2 = (i + 1) * (slices + 1) + j;
+
+			glTexCoord2f(vertices[index1].t, vertices[index1].s);
+			glVertex3f(vertices[index1].x,vertices[index1].y,vertices[index1].z);
+
+			glTexCoord2f(vertices[index2].t, vertices[index2].s);
+			glVertex3f(vertices[index2].x,vertices[index2].y,vertices[index2].z);
+		}
+		glEnd();
+	}
+}
+//Skybox function, Takes a float D which specifies the size of the skybox
+//This function maps the skybox textures to their corresponding size.
+void skybox(float D)
 {
 	glBindTexture(GL_TEXTURE_2D, txId[0]);   //replace with a texture
 	glBegin(GL_QUADS);
-
 	////////////////////// BACK WALL ///////////////////////
-		glTexCoord2f(0.0f,2.0f);
-		glVertex3f(-15, 1, -15);
-
+		glTexCoord2f(0.0f,1.0f);
+		glVertex3f(D, 2*D, D);
 		glTexCoord2f(0.0f,0.0f);
-		glVertex3f(-15, -1, -15);
+		glVertex3f(D, 0, D);
+		glTexCoord2f(1.0f,0.0f);
+		glVertex3f(-D, 0, D);
+		glTexCoord2f(1.0f,1.0f);
+		glVertex3f(-D, 2*D, D);
+	glEnd();
 
-		glTexCoord2f(12.0f,0.0f);
-		glVertex3f(15, -1, -15);
-
-		glTexCoord2f(12.0f,2.0f);
-		glVertex3f(15, 1, -15);
-
-		////////////////////// FRONT WALL ///////////////////////
-		glTexCoord2f(0.0f,2.0f);
-		glVertex3f(-15, 1, 15);
-
+	glBindTexture(GL_TEXTURE_2D, txId[3]);   //replace with a texture
+	glBegin(GL_QUADS);
+	////////////////////// FRONT WALL ///////////////////////
+		glTexCoord2f(0.0f,1.0f);
+		glVertex3f(-D, 2*D, -D);
 		glTexCoord2f(0.0f,0.0f);
-		glVertex3f(-15, -1, 15);
+		glVertex3f(-D, 0, -D);
+		glTexCoord2f(1.0f,0.0f);
+		glVertex3f(D, 0, -D);
+		glTexCoord2f(1.0f,1.0f);
+		glVertex3f(D, 2*D, -D);
+	glEnd();
 
-		glTexCoord2f(12.0f,0.0f);
-		glVertex3f(15, -1, 15);
-
-		glTexCoord2f(12.0f,2.0f);
-		glVertex3f(15, 1, 15);
-
-		////////////////////// LEFT WALL ///////////////////////
-		glTexCoord2f(0.0f,2.0f);
-		glVertex3f(-15, 1, -15);
-
+	glBindTexture(GL_TEXTURE_2D, txId[4]);   //replace with a texture
+	glBegin(GL_QUADS);
+	////////////////////// DOWN WALL ///////////////////////
+		glTexCoord2f(0.0f,1.0f);
+		glVertex3f(-D, 0, -D);
 		glTexCoord2f(0.0f,0.0f);
-		glVertex3f(-15, -1, -15);
+		glVertex3f(-D, 0, D);
+		glTexCoord2f(1.0f,0.0f);
+		glVertex3f(D, 0, D);
+		glTexCoord2f(1.0f,1.0f);
+		glVertex3f(D, 0, -D);
+	glEnd();
 
-		glTexCoord2f(12.0f,0.0f);
-		glVertex3f(-15, -1, 15);
-
-		glTexCoord2f(12.0f,2.0f);
-		glVertex3f(-15, 1, 15);
-
-		////////////////////// RIGHT WALL ///////////////////////
-
-		glTexCoord2f(0.0f,2.0f);
-		glVertex3f(15, 1, -15);
-
+	glBindTexture(GL_TEXTURE_2D, txId[5]);   //replace with a texture
+	glBegin(GL_QUADS);
+	////////////////////// UP WALL ///////////////////////
+		glTexCoord2f(0.0f,1.0f);
+		glVertex3f(-D, 2*D, D);
 		glTexCoord2f(0.0f,0.0f);
-		glVertex3f(15, -1, -15);
-
-		glTexCoord2f(12.0f,0.0f);
-		glVertex3f(15, -1, 15);
-
-		glTexCoord2f(12.0f,2.0f);
-		glVertex3f(15, 1, 15);
-
+		glVertex3f(-D, 2*D, -D);
+		glTexCoord2f(1.0f,0.0f);
+		glVertex3f(D, 2*D, -D);
+		glTexCoord2f(1.0f,1.0f);
+		glVertex3f(D, 2*D, D);
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, txId[6]);   //replace with a texture
+	glBegin(GL_QUADS);
+	////////////////////// LEFT WALL ///////////////////////
+		glTexCoord2f(0.0f,1.0f);
+		glVertex3f(-D, 2*D, D);
+		glTexCoord2f(0.0f,0.0f);
+		glVertex3f(-D, 0, D);
+		glTexCoord2f(1.0f,0.0f);
+		glVertex3f(-D, 0, -D);
+		glTexCoord2f(1.0f,1.0f);
+		glVertex3f(-D, 2*D, -D);
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, txId[7]);   //replace with a texture
+	glBegin(GL_QUADS);
+	////////////////////// RIGHT WALL ///////////////////////
+		glTexCoord2f(0.0f,1.0f);
+		glVertex3f(D, 2*D, -D);
+		glTexCoord2f(0.0f,0.0f);
+		glVertex3f(D, 0, -D);
+		glTexCoord2f(1.0f,0.0f);
+		glVertex3f(D, 0, D);
+		glTexCoord2f(1.0f,1.0f);
+		glVertex3f(D, 2*D, D);
 	glEnd();
 }
+
+
 void floor()
 {
 	float white[4] = {1, 1, 1, 1};
 	float black[4] = {0, 0, 0, 1};
-	glColor4f(0.7, 0.7, 0.7, 1.0);  //The floor has a gray colour
+	glColor4f(0.2, 0.2, 0.7, 1.0);  //The floor has a gray colour
 	glNormal3f(0.0, 1.0, 0.0);		//Normal vector of the floor
 	glMaterialfv(GL_FRONT, GL_SPECULAR, black);
 	//The floor is made up of several tiny squares on a 400 x 400 grid. Each square has a unit size.
 	glBegin(GL_QUADS);
-	for(int i = -200; i < 200; i++)
+	float height = 2;
+	for(int i = -100; i < 100; i++)
 	{
-		for(int j = -200;  j < 200; j++)
+		for(int j = -100;  j < 100; j++)
 		{
-			glVertex3f(i, 0, j);
-			glVertex3f(i, 0, j+1);
-			glVertex3f(i+1, 0, j+1);
-			glVertex3f(i+1, 0, j);
+			glVertex3f(i, height, j);
+			glVertex3f(i, height, j+1);
+			glVertex3f(i+1, height, j+1);
+			glVertex3f(i+1, height, j);
 		}
 	}
 	glEnd();
@@ -119,48 +220,61 @@ void floor()
 }
 
 
-//--------------- MODEL BASE --------------------------------------
-// This is a common base for the locomotive and wagons
-// The base is of rectangular shape (20 length x 10 width x 2 height)
-// and has wheels and connectors attached.
-//-----------------------------------------------------------------
+//--------------- Space Ship  --------------------------------------
+// This is a base for the space ship 
+// The spaceshipe is made from two gluCylinders, a gluSphere and a 
+// glutSolidCone for a light that sticks out the bottom
+//------------------------------------------------------------------
+
 void spaceShip()
 {
-    //glColor4f(0.2, 0.2, 0.2, 1.0);   //Base color
-	glTranslatef(0,30,0);
-	glScalef(20,20,20);
+	glScalef(10,10,10);
 	
     glPushMatrix();
-		//glTranslatef(0.0, 4.0, 0.0);
-		//glScalef(20.0, 10.0, 10.0);     //Size 20x10 units, thickness 2 units.
 		glPushMatrix();
-			glColor3f(0.64,0.65,0.64);
 			glRotatef(90,-1,0,0);
 			glScalef(0.9,1,0.9);
-			GLUquadric *basepart;
-			basepart = gluNewQuadric();
+			glColor3f(1.0, 1.0, 1.0); // Set color to white
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, txId[8]); 
+			GLUquadric *basepart = gluNewQuadric();
+			gluQuadricTexture(basepart, GL_TRUE); // Enable texture coordinates
+        	gluQuadricNormals(basepart, GLU_SMOOTH); 
+			glBindTexture(GL_TEXTURE_2D, txId[8]);   //replace with a texture
 			gluCylinder(basepart,2,0.7,0.2,30,30);
+			glDisable(GL_TEXTURE_2D);
 		glPopMatrix();
+
 		glPushMatrix();
-			glColor3f(0.64,0.65,0.64);
 			glRotatef(90,1,0,0);
 			glScalef(0.9,1,0.9);
-			//glTranslatef(0,-1,0);
-			GLUquadric *basepart2;
-			basepart2 = gluNewQuadric();
+			glColor3f(1.0, 1.0, 1.0); // Set color to white
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, txId[8]); 
+			GLUquadric *basepart2 = gluNewQuadric();
+			gluQuadricTexture(basepart2, GL_TRUE); // Enable texture coordinates
+        	gluQuadricNormals(basepart2, GLU_SMOOTH); 
+			glBindTexture(GL_TEXTURE_2D, txId[8]);   //replace with a texture
 			gluCylinder(basepart2,2,0.7,0.2,30,30);
+			glDisable(GL_TEXTURE_2D);
 		glPopMatrix();
+
 		glPushMatrix();
 			glColor3f(0.62,0.93,0.93);
 			glScalef(1,0.8,1);
 			glTranslatef(0,0,0);
-			GLUquadric *ball;
-			ball = gluNewQuadric();
+			glEnable(GL_TEXTURE_2D);
+        	glBindTexture(GL_TEXTURE_2D, txId[9]);
+			GLUquadric *ball = gluNewQuadric();
+			gluQuadricTexture(ball, GL_TRUE); // Enable texture coordinates
+        	gluQuadricNormals(ball, GLU_SMOOTH);
 			gluSphere(ball,0.7,30,30);
 		glPopMatrix();
-		//qluQuadricDrawStyle(q, GLU_FILL);
-		glPushMatrix();
+
+		/*glPushMatrix();
 			glColor3f(1,1,1);
+			glEnable(GL_TEXTURE_2D);
+        	glBindTexture(GL_TEXTURE_2D, txId[9]);
 			glTranslatef(0.5,-0.5,0);
 			glScalef(1,1,1);
 			glRotatef(45,0,0,1);
@@ -168,12 +282,29 @@ void spaceShip()
 				glRotatef(-90,1,0,0);
 				glutSolidCone(0.2,0.5,20,20);
 			glPopMatrix();
-
-		glPopMatrix();
-
+			glDisable(GL_TEXTURE_2D);
+		glPopMatrix();*/
 	glPopMatrix();
-
-
- 
 }
 
+void spiral()
+{
+	glPushMatrix();
+		glDisable(GL_TEXTURE_2D);
+		glColor3f(1,1,1);
+		glBegin(GL_QUAD_STRIP);
+		for(float t = 0; t<= 20.0; t+=0.1)
+		{
+			float y = t;
+			float x = 2*cos(-3*t);
+			float z = 2*sin(-3*t);
+			//float s = 1*t;
+			//glTexCoord2f(s, 0.0); // Texture coordinate for the bottom vertex
+            glVertex3f(x, y, z);
+            
+            //glTexCoord2f(s, 1.0); // Texture coordinate for the top vertex
+            glVertex3f(x + 0.5, y + 0.5, z + 0.5);
+		}
+		glEnd();
+	glPopMatrix();
+}	
