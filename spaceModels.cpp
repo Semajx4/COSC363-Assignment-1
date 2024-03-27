@@ -22,28 +22,28 @@ void loadTexture()
 	glGenTextures(5, txId); 	// Create 2 texture ids
 
 	glBindTexture(GL_TEXTURE_2D, txId[0]); 
-    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/pano10.tga");
+    loadTGA("images/pano10.tga");
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
 	
 	glBindTexture(GL_TEXTURE_2D, txId[1]);  //
-    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/ship_texture.tga");
+    loadTGA("images/ship_texture.tga");
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
 
 	glBindTexture(GL_TEXTURE_2D, txId[2]);  //Use this texture
-    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/glass_texture1.tga");
+    loadTGA("images/glass_texture1.tga");
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 
 	glBindTexture(GL_TEXTURE_2D, txId[3]);
-	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Glow.tga");
+	loadTGA("images/Glow.tga");
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
 	glBindTexture(GL_TEXTURE_2D, txId[4]);  //Use this texture
-    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/dirt.tga");
+    loadTGA("images/dirt.tga");
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 

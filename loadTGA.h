@@ -14,7 +14,11 @@
 #include <iostream>
 #include <fstream>
 #include <GL/freeglut.h>
+#include <unistd.h> // For getcwd
+#include <cstring>  // For strcat
+#include <filesystem> // for std::filesystem
 using namespace std;
+namespace fs = std::filesystem;
 
 void loadTGA(const char* filename)
 {
@@ -22,10 +26,17 @@ void loadTGA(const char* filename)
     char* imageData, temp;
     short int s_garb, wid, hgt;
     int nbytes, size, indx;
-    ifstream file( filename, ios::in | ios::binary);
+	
+	// Get the current working directory
+	fs::path cwd = fs::current_path();
+    // Get the parent directory of the current working directory
+    fs::path parentDir = cwd.parent_path();
+    // Construct the full path to the image file relative to the parent directory
+    fs::path imagePath = parentDir / filename;
+    ifstream file(imagePath.string(), ios::in | ios::binary);
 	if(!file)
 	{
-		cout << "*** Error opening image file: " << filename << endl;
+		cout << "*** Error opening image file: " << imagePath << endl;
 		exit(1);
 	}
 	file.read (&id, 1);
