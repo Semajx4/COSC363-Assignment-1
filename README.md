@@ -3,10 +3,9 @@
 
 
 ## Getting started
-
+Build and run using CMake on linux
 
 ## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+James Suddaby
 
 
-## Project status

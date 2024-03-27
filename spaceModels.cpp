@@ -18,74 +18,19 @@ GLuint txId[10];   //Texture ids
 
 void loadTexture()				
 {
-	glGenTextures(10, txId); 	// Create 2 texture ids
+	glGenTextures(3, txId); 	// Create 2 texture ids
 
-	glBindTexture(GL_TEXTURE_2D, txId[0]);  //Use this texture
+	glBindTexture(GL_TEXTURE_2D, txId[0]); 
     loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/pano10.tga");
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
 	
-	glBindTexture(GL_TEXTURE_2D, txId[1]);  //Use this texture
-    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Floor.tga");
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
-
-
-//----------------------------------------------------------------------------------------
-	//Textures for all six sides of the sky box:
-
-	
-	glBindTexture(GL_TEXTURE_2D, txId[2]);  //Use this texture
-	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Back.tga");
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
-	
-	glBindTexture(GL_TEXTURE_2D, txId[3]);  //Use this texture
-	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Front.tga");
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
-	
-	glBindTexture(GL_TEXTURE_2D, txId[4]);  //Use this texture
-	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Down.tga");
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
-	
-	glBindTexture(GL_TEXTURE_2D, txId[5]);  //Use this texture
-	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Up.tga");
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
-	
-	glBindTexture(GL_TEXTURE_2D, txId[6]);  //Use this texture
-	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Left.tga");
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	glBindTexture(GL_TEXTURE_2D, txId[7]);  //Use this texture
-	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Right.tga");
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-//----------------------------------------------------------------------
-
-
-	glBindTexture(GL_TEXTURE_2D, txId[8]);  //Use this texture
+	glBindTexture(GL_TEXTURE_2D, txId[1]);  //
     loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/ship_texture.tga");
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
 
-	glBindTexture(GL_TEXTURE_2D, txId[9]);  //Use this texture
+	glBindTexture(GL_TEXTURE_2D, txId[2]);  //Use this texture
     loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/glass_texture1.tga");
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
@@ -111,86 +56,6 @@ void drawSurfaceofRevolution(const std::vector<Vertex>& vertices, int slices, in
 		}
 		glEnd();
 	}
-}
-//Skybox function, Takes a float D which specifies the size of the skybox
-//This function maps the skybox textures to their corresponding size.
-void skybox(float D)
-{
-	glBindTexture(GL_TEXTURE_2D, txId[0]);   //replace with a texture
-	glBegin(GL_QUADS);
-	////////////////////// BACK WALL ///////////////////////
-		glTexCoord2f(0.0f,1.0f);
-		glVertex3f(D, 2*D, D);
-		glTexCoord2f(0.0f,0.0f);
-		glVertex3f(D, 0, D);
-		glTexCoord2f(1.0f,0.0f);
-		glVertex3f(-D, 0, D);
-		glTexCoord2f(1.0f,1.0f);
-		glVertex3f(-D, 2*D, D);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, txId[3]);   //replace with a texture
-	glBegin(GL_QUADS);
-	////////////////////// FRONT WALL ///////////////////////
-		glTexCoord2f(0.0f,1.0f);
-		glVertex3f(-D, 2*D, -D);
-		glTexCoord2f(0.0f,0.0f);
-		glVertex3f(-D, 0, -D);
-		glTexCoord2f(1.0f,0.0f);
-		glVertex3f(D, 0, -D);
-		glTexCoord2f(1.0f,1.0f);
-		glVertex3f(D, 2*D, -D);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, txId[4]);   //replace with a texture
-	glBegin(GL_QUADS);
-	////////////////////// DOWN WALL ///////////////////////
-		glTexCoord2f(0.0f,1.0f);
-		glVertex3f(-D, 0, -D);
-		glTexCoord2f(0.0f,0.0f);
-		glVertex3f(-D, 0, D);
-		glTexCoord2f(1.0f,0.0f);
-		glVertex3f(D, 0, D);
-		glTexCoord2f(1.0f,1.0f);
-		glVertex3f(D, 0, -D);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, txId[5]);   //replace with a texture
-	glBegin(GL_QUADS);
-	////////////////////// UP WALL ///////////////////////
-		glTexCoord2f(0.0f,1.0f);
-		glVertex3f(-D, 2*D, D);
-		glTexCoord2f(0.0f,0.0f);
-		glVertex3f(-D, 2*D, -D);
-		glTexCoord2f(1.0f,0.0f);
-		glVertex3f(D, 2*D, -D);
-		glTexCoord2f(1.0f,1.0f);
-		glVertex3f(D, 2*D, D);
-	glEnd();
-	glBindTexture(GL_TEXTURE_2D, txId[6]);   //replace with a texture
-	glBegin(GL_QUADS);
-	////////////////////// LEFT WALL ///////////////////////
-		glTexCoord2f(0.0f,1.0f);
-		glVertex3f(-D, 2*D, D);
-		glTexCoord2f(0.0f,0.0f);
-		glVertex3f(-D, 0, D);
-		glTexCoord2f(1.0f,0.0f);
-		glVertex3f(-D, 0, -D);
-		glTexCoord2f(1.0f,1.0f);
-		glVertex3f(-D, 2*D, -D);
-	glEnd();
-	glBindTexture(GL_TEXTURE_2D, txId[7]);   //replace with a texture
-	glBegin(GL_QUADS);
-	////////////////////// RIGHT WALL ///////////////////////
-		glTexCoord2f(0.0f,1.0f);
-		glVertex3f(D, 2*D, -D);
-		glTexCoord2f(0.0f,0.0f);
-		glVertex3f(D, 0, -D);
-		glTexCoord2f(1.0f,0.0f);
-		glVertex3f(D, 0, D);
-		glTexCoord2f(1.0f,1.0f);
-		glVertex3f(D, 2*D, D);
-	glEnd();
 }
 
 
@@ -239,11 +104,11 @@ void spaceShip()
 			glScalef(0.9,1,0.9);
 			glColor3f(1.0, 1.0, 1.0); // Set color to white
 			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, txId[8]); 
+			glBindTexture(GL_TEXTURE_2D, txId[1]); 
 			GLUquadric *basepart = gluNewQuadric();
 			gluQuadricTexture(basepart, GL_TRUE); // Enable texture coordinates
         	gluQuadricNormals(basepart, GLU_SMOOTH); 
-			glBindTexture(GL_TEXTURE_2D, txId[8]);   //replace with a texture
+			glBindTexture(GL_TEXTURE_2D, txId[1]);   //replace with a texture
 			gluCylinder(basepart,2,0.7,0.2,30,30);
 			glDisable(GL_TEXTURE_2D);
 		glPopMatrix();
@@ -253,11 +118,11 @@ void spaceShip()
 			glScalef(0.9,1,0.9);
 			glColor3f(1.0, 1.0, 1.0); // Set color to white
 			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, txId[8]); 
+			glBindTexture(GL_TEXTURE_2D, txId[1]); 
 			GLUquadric *basepart2 = gluNewQuadric();
 			gluQuadricTexture(basepart2, GL_TRUE); // Enable texture coordinates
         	gluQuadricNormals(basepart2, GLU_SMOOTH); 
-			glBindTexture(GL_TEXTURE_2D, txId[8]);   //replace with a texture
+			glBindTexture(GL_TEXTURE_2D, txId[1]);   //replace with a texture
 			gluCylinder(basepart2,2,0.7,0.2,30,30);
 			glDisable(GL_TEXTURE_2D);
 		glPopMatrix();
@@ -267,7 +132,7 @@ void spaceShip()
 			glScalef(1,0.8,1);
 			glTranslatef(0,0,0);
 			glEnable(GL_TEXTURE_2D);
-        	glBindTexture(GL_TEXTURE_2D, txId[9]);
+        	glBindTexture(GL_TEXTURE_2D, txId[2]);
 			GLUquadric *ball = gluNewQuadric();
 			gluQuadricTexture(ball, GL_TRUE); // Enable texture coordinates
         	gluQuadricNormals(ball, GLU_SMOOTH);
@@ -277,7 +142,7 @@ void spaceShip()
 		glPushMatrix();
 			glColor3f(1,1,1);
 			glEnable(GL_TEXTURE_2D);
-        	glBindTexture(GL_TEXTURE_2D, txId[9]);
+        	glBindTexture(GL_TEXTURE_2D, txId[2]);
 			glTranslatef(0.5,-0.5,0);
 			glScalef(1,1,1);
 			glRotatef(45,0,0,1);
@@ -418,6 +283,8 @@ void drawAlien(bool shadow, float theta, bool fireBullet, float bulletHorz, floa
 	  glutSolidCube(1);
 	glPopMatrix();
 }
+
+
 void spiral(bool shadow)
 {
 	glPushMatrix();
