@@ -21,7 +21,7 @@ void loadTexture()
 	glGenTextures(10, txId); 	// Create 2 texture ids
 
 	glBindTexture(GL_TEXTURE_2D, txId[0]);  //Use this texture
-    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/EquiRectangular4.tga");
+    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/pano10.tga");
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);	
 	
@@ -94,7 +94,7 @@ void loadTexture()
 }
 
 //A sky dome surface of revolution
-void skyDome(const std::vector<Vertex>& vertices, int slices, int stacks)
+void drawSurfaceofRevolution(const std::vector<Vertex>& vertices, int slices, int stacks)
 {
 	glBindTexture(GL_TEXTURE_2D, txId[0]);   //replace with a texture
 	for(int i=0; i< stacks; ++i){
@@ -103,10 +103,10 @@ void skyDome(const std::vector<Vertex>& vertices, int slices, int stacks)
 			int index1 = i*(slices + 1) + j;
 			int index2 = (i + 1) * (slices + 1) + j;
 
-			glTexCoord2f(vertices[index1].t, vertices[index1].s);
+			glTexCoord2f(vertices[index1].s,  vertices[index1].t);
 			glVertex3f(vertices[index1].x,vertices[index1].y,vertices[index1].z);
 
-			glTexCoord2f(vertices[index2].t, vertices[index2].s);
+			glTexCoord2f(vertices[index2].s, vertices[index2].t);
 			glVertex3f(vertices[index2].x,vertices[index2].y,vertices[index2].z);
 		}
 		glEnd();
@@ -194,19 +194,20 @@ void skybox(float D)
 }
 
 
-void floor()
+void drawFloor(float size)
 {
 	float white[4] = {1, 1, 1, 1};
 	float black[4] = {0, 0, 0, 1};
-	glColor4f(0.2, 0.2, 0.7, 1.0);  //The floor has a gray colour
+	glColor4f(0.2, 0.2, 0.2, 1.0);  //The floor has a gray colour
 	glNormal3f(0.0, 1.0, 0.0);		//Normal vector of the floor
 	glMaterialfv(GL_FRONT, GL_SPECULAR, black);
 	//The floor is made up of several tiny squares on a 400 x 400 grid. Each square has a unit size.
+	glDisable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
-	float height = 2;
-	for(int i = -100; i < 100; i++)
+	float height = 0;
+	for(int i = -size; i < size; i+=1)
 	{
-		for(int j = -100;  j < 100; j++)
+		for(int j = -size;  j < size; j+=1)
 		{
 			glVertex3f(i, height, j);
 			glVertex3f(i, height, j+1);
@@ -227,7 +228,9 @@ void floor()
 //------------------------------------------------------------------
 
 void spaceShip()
-{
+{	
+	GLfloat mat_emission[] = {0.8, 0.8, 0.8, 1.0}; // Emissive material properties
+	GLfloat no_mat[] = {0.0, 0.0, 0.0, 1.0};
 	glScalef(10,10,10);
 	
     glPushMatrix();
@@ -271,7 +274,7 @@ void spaceShip()
 			gluSphere(ball,0.7,30,30);
 		glPopMatrix();
 
-		/*glPushMatrix();
+		glPushMatrix();
 			glColor3f(1,1,1);
 			glEnable(GL_TEXTURE_2D);
         	glBindTexture(GL_TEXTURE_2D, txId[9]);
@@ -283,28 +286,159 @@ void spaceShip()
 				glutSolidCone(0.2,0.5,20,20);
 			glPopMatrix();
 			glDisable(GL_TEXTURE_2D);
-		glPopMatrix();*/
+		glPopMatrix();
+		glPushMatrix();
+			glMaterialfv(GL_FRONT, GL_EMISSION, mat_emission);
+			glColor4f(1, 1, 1, 1);
+			glDisable(GL_TEXTURE_2D);
+			
+			glTranslatef(0.501,-0.501,0);
+			glScalef(1,1,1);
+			glRotatef(45,0,0,1);
+			glPushMatrix();
+			glEnable(GL_LIGHTING);
+				glRotatef(-90,1,0,0);
+				glColor4f(1,1,1,1);
+				glutSolidCylinder(0.19,0.01,30,30);
+			glPopMatrix();
+		glPopMatrix();
+		glMaterialfv(GL_FRONT, GL_EMISSION, no_mat);
 	glPopMatrix();
 }
+void drawAlien(bool shadow, float theta, bool fireBullet, float bulletHorz, float bulletVert)
+{
+	if (shadow){
+		glColor3f(0.2,0.2,0.2);
+	} else {
+		glColor3f(0.5, 1.0, 0.2);}
+	//Head
+	glPushMatrix();
+	  glTranslatef(0, 7.7, 0);
+	  glutSolidSphere(1,20,20);
+	  glPushMatrix();
+	  	glTranslatef(0, 0.1, 0);
+	  glPopMatrix();
+	glPopMatrix();
 
-void spiral()
+	if (shadow){
+		glColor3f(0.2,0.2,0.2);
+	} else {
+	glColor3f(0., 1., 0.);
+	}		
+	//Torso
+	glPushMatrix();
+	  glTranslatef(0, 5.5, 0);
+	  glScalef(3.7, 2.5, 1.4);
+	  glutSolidCube(1);
+	glPopMatrix();
+
+	if (shadow){
+		glColor3f(0.2,0.2,0.2);
+	} else {
+	glColor3f(0., 1., 0.);
+	}			
+	//Legs
+	glPushMatrix();
+	  glTranslatef(0, 1, 0);
+	  glRotatef(-90,1,0,0);
+	  glScalef(2,2,2);
+	  glutSolidCone(1,2,20,20);
+	glPopMatrix();
+
+
+
+	if (shadow){
+		glColor3f(0.2,0.2,0.2);
+	} else {
+	glColor3f(0., 1., 0.);
+	}		
+	//Right arm
+	glPushMatrix();
+	  glTranslatef(-2.2, 6.5, 0);
+	  glRotatef(theta,1,0,0);
+	  glTranslatef(2.2,-6.5,0);
+	  glTranslatef(-2.2,5,0);
+	  glScalef(0.8, 4, 0.8);
+	  glutSolidCube(1);
+	glPopMatrix();
+	
+	if (shadow){
+		glColor3f(0.2,0.2,0.2);
+	} else {
+	glColor3f(0., 0., 0.);
+	}		
+	//gun
+	glPushMatrix();
+		glTranslatef(-2.2, 6.5, 0);
+		glRotatef(theta,1,0,0);
+		glTranslatef(2.2,-6.5,0);
+		glTranslatef(-2.2,2,0);
+		glPushMatrix();
+			glScalef(0.5, 1.5, 0.5);
+			glutSolidCube(1);
+		glPopMatrix();
+		glPushMatrix();
+			glTranslatef(0,1,-0.25);
+			glScalef(0.5, 0.5, 1);
+			glutSolidCube(1);
+		glPopMatrix();
+	glPopMatrix();
+
+	if (shadow){
+		glColor3f(0.2,0.2,0.2);
+	} else {
+		glColor3f(1., 0., 0.);
+	}	
+	//bullet
+	if (fireBullet){
+		glPushMatrix();
+			glTranslatef(-2.2, 6.5, 0);
+			glRotatef(theta,1,0,0);
+			glTranslatef(2.2,-6.5,0);
+			glTranslatef(-2.2,2,0);
+			glPushMatrix();
+				glTranslatef(0, -bulletHorz, bulletVert);
+				glScalef(0.4,0.4,0.4);
+				glutSolidSphere(0.5,10,10);
+			glPopMatrix();
+		glPopMatrix();
+	}
+	if (shadow){
+		glColor3f(0.2,0.2,0.2);
+	} else {
+	glColor3f(0., 1., 0.);
+	}		
+	//Left arm
+	glPushMatrix();
+	  glTranslatef(2.2, 6.5, 0);
+	  glRotatef(1.8*theta,1,0,0);
+	  glTranslatef(-2.2,-6.5,0);
+	  glTranslatef(2.2, 5, 0);
+	  glScalef(0.8, 4, 0.8);
+	  glutSolidCube(1);
+	glPopMatrix();
+}
+void spiral(bool shadow)
 {
 	glPushMatrix();
 		glDisable(GL_TEXTURE_2D);
-		glColor3f(1,1,1);
+		if (shadow)
+		{
+			glColor3f(0.2,0.2,0.2);
+		} else 
+		{
+			glColor3f(1,1,0);
+		}
 		glBegin(GL_QUAD_STRIP);
-		for(float t = 0; t<= 20.0; t+=0.1)
+		for(float t = 0; t<= 12.0; t+=0.1)
 		{
 			float y = t;
 			float x = 2*cos(-3*t);
 			float z = 2*sin(-3*t);
-			//float s = 1*t;
-			//glTexCoord2f(s, 0.0); // Texture coordinate for the bottom vertex
             glVertex3f(x, y, z);
-            
-            //glTexCoord2f(s, 1.0); // Texture coordinate for the top vertex
             glVertex3f(x + 0.5, y + 0.5, z + 0.5);
 		}
 		glEnd();
 	glPopMatrix();
 }	
+

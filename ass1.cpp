@@ -9,24 +9,31 @@
 #include "spaceModels.h"
 #include <vector>
 #include <GL/gl.h>
+#include <stdio.h>
 
 
 
 //---------------------------------------------------------------------
-float angle=0.0;
-
+float angle =0.0;
+float theta = 20.0;
+int gunTimerCounter = 0;
+int gunWait = 0;
+float gunAngleIncrement = 2;
+float alienX, alienZ, modelAngle, liftOffHeight =0;
+bool fireBullet, liftOff = false;
+float bulletHorz, bulletVert = 0;
 std::vector<Vertex> generateDomeVertices(int slices, int stacks, float radius){
 	std::vector<Vertex> vertices;
 	for(int i =0; i <= stacks; ++i){
-		float stackAngle = M_PI/2 - (float)i / stacks * M_PI;
-		float xy = radius * cosf(stackAngle);
-		float z = radius * sinf(stackAngle);
+		float stackAngle = M_PI_2 - (float)i / stacks * M_PI_2;
+		float xz = radius * cosf(stackAngle);
+		float y = radius * sinf(stackAngle);
 		float t = (float)i/stacks;
 
 		for(int j =0; j<= slices; ++j){
 			float sliceAngle = 2*M_PI * j /slices;
-			float x = xy*cosf(sliceAngle);
-			float y = xy*sinf(sliceAngle);
+			float x = xz*cosf(sliceAngle);
+			float z = xz*sinf(sliceAngle);
 			float s = (float)j/slices;
 
 			vertices.push_back({x,y,z,s,t});
@@ -74,12 +81,25 @@ bool checkCollision(float x, float z) {
     }
     return true; // No collision
 }
-float cam_angle = 0,look_x, look_z=-1, eye_x, eye_z = 20;  //Camera parameters
+void handleLiftOff(unsigned char key, int x, int y){
+    switch (key){
+        case 32:
+            liftOff = true;
+            break;
+        case 13:
+            liftOffHeight = 0;
+            liftOff = false;
+            break;
+    }
+}
+float cam_angle = 0,look_x, look_z=-1, eye_x, eye_z = 40;  //Camera parameters
 void special(int key, int x, int y) {
     float new_eye_x = eye_x, new_eye_z = eye_z;
+    float radian_conversion = M_PI / 180.0; // Radians per degree
+    float turn_angle = 5.0 * radian_conversion; // 5 degrees in radians
 
-    if (key == GLUT_KEY_LEFT) cam_angle -= 0.1;
-    else if (key == GLUT_KEY_RIGHT) cam_angle += 0.1;
+    if (key == GLUT_KEY_LEFT) cam_angle -= turn_angle;
+    else if (key == GLUT_KEY_RIGHT) cam_angle += turn_angle;
     else if (key == GLUT_KEY_DOWN) {
         new_eye_x -= 0.1 * sin(cam_angle);
         new_eye_z += 0.1 * cos(cam_angle);
@@ -98,79 +118,121 @@ void special(int key, int x, int y) {
 	look_z = eye_z - 100*cos(cam_angle);
 	glutPostRedisplay();
 }
+void displayAlienModel(float shadowMat[16]){
+    glPushMatrix();
+        glPushMatrix();
+            glPushMatrix();
+                glEnable(GL_LIGHTING);
+                glTranslatef(10,0,10);
+                drawAlien(false, -theta, fireBullet, bulletHorz, bulletVert);
+                glDisable(GL_LIGHTING);
+            glPopMatrix();
+        glPopMatrix();
 
+        glPushMatrix();
+            glTranslatef(10,0.2,10);
+            glMultMatrixf(shadowMat);
+            glDisable(GL_LIGHTING);
+            glColor3f(0.1, 0.1, 0.1);
+            drawAlien(true, -theta,  fireBullet, bulletHorz, bulletVert); // Draw the shadow
+        glPopMatrix();
+    glPopMatrix();
+}
 
 //-------------------------------------------------------------------
 void display(void)
 {
     float light[] = {20.0f, 100.0f, 20.0f, 1.0f};  //Light's position (directly above the origin)
     float spotDir[] = {1,-1,0};
-    float spotPosn[] = {-18,14,0,1};
+    float spotPosn[] = {10,20,10,1};
+    float shadowMat[16] = {spotPosn[1],0,0,0, -spotPosn[0],0,-spotPosn[2],-1,0,0,spotPosn[1],0,0,0,0,spotPosn[1]};
+
     glClear (GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluPerspective(90., 0.5, 1., 600.); // Adjust the field of view and clipping planes
-
+    gluPerspective(60., 0.5, 0.1, 200.); // Adjust the field of view and clipping planes
+    
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	float cameraHeight = 15; // Adjust the camera height as needed
 	gluLookAt(eye_x, cameraHeight, eye_z, look_x, cameraHeight, look_z, 0, 1, 0); // Adjust the eye position and look at position
-    std::vector<Vertex> vertices = generateDomeVertices(30,30,500);
-
+    std::vector<Vertex> skyDomeVertices = generateDomeVertices(30,30,100);
 	glPushMatrix();
-		//glTranslatef(eye_x, 0, eye_z);
         glEnable(GL_TEXTURE_2D);
-
-        skyDome(vertices, 30, 30);
-
+        drawSurfaceofRevolution(skyDomeVertices, 30, 30);
         glDisable(GL_TEXTURE_2D); // Disable texture mapping
-
 	glPopMatrix();
 
-    //gluLookAt (-80, 80, 250, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
     
-    //glPushMatrix();
-        //glTranslatef(0,5,0);
-        //walls();
-    //glPopMatrix();
-
-    //;glMatrixMode(GL_MODELVIEW);
-    //glLoadIdentity();
     glPushMatrix();
-        glRotatef(angle,0,1,0);
+        if(liftOff){
+            
+            glTranslatef(0,liftOffHeight,0);
         
+            
+        } 
+        glRotatef(angle,0,1,0);
         glPushMatrix();
-            glTranslatef(0,23,0);
+            glTranslatef(10,30,0);
             glLightfv(GL_LIGHT0, GL_POSITION, light);
             glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spotDir);
             glLightfv(GL_LIGHT1, GL_POSITION, spotPosn);
-            spaceShip();                //Toy train locomotive
+            spaceShip();                //
         glPopMatrix();
-        //glRotatef(10.5,0,1,0);
-        /*glPushMatrix();
-            glTranslatef(0,1,-120);
-            //wagon();                //Toy wagon 
-        glPopMatrix();
-        glRotatef(10.5,0,1,0);
-        glPushMatrix();
-            glTranslatef(0,1,-120);
-            //wagon();                //Toy wagon 
-        glPopMatrix();
-        glRotatef(10.5,0,1,0);
-        glPushMatrix();
-            glTranslatef(0,1,-120);
-            //wagon();                //Toy wagon 
-        glPopMatrix();*/
     glPopMatrix();
-    
-    //floor();                 //A tessellated floor plane
+
+        
+    drawFloor(100);     //A tessellated floor plane
+
     glPushMatrix();
-        glRotatef(-angle*3,0,1,0);
-        glTranslatef(0,3,0);    
-        spiral();
+        glPushMatrix();
+            glTranslatef(0,0.2,0);    
+            spiral(false);
+        glPopMatrix();
+        glPushMatrix();
+            glTranslatef(0,0.1,0);    
+            glMultMatrixf(shadowMat);
+            glDisable(GL_LIGHTING);
+            glColor3f(0.1, 0.1, 0.1);
+            spiral(true);
+        glPopMatrix();
     glPopMatrix();
-   //tracks(120, 10);         //Circular tracks with mean radius 120 units, width 10 units
-   glutSwapBuffers();       //Double buffered animation
+    glPushMatrix();
+        glTranslatef(13,0,1);
+        glPushMatrix();
+            glTranslatef(0,0.2,0);    
+            spiral(false);
+        glPopMatrix();
+        glPushMatrix();
+            glTranslatef(0,0.1,0);    
+            glMultMatrixf(shadowMat);
+            glDisable(GL_LIGHTING);
+            glColor3f(0.1, 0.1, 0.1);
+            spiral(true);
+        glPopMatrix();
+    glPopMatrix();
+
+
+
+    //draw alien and it's shadow
+    // Draw alien and its shadow
+    glPushMatrix();
+        glTranslatef(0,0,0);
+        displayAlienModel(shadowMat);
+    glPopMatrix();
+    glPushMatrix();
+        glTranslatef(15,0,0);
+        displayAlienModel(shadowMat);
+    glPopMatrix();
+    glPushMatrix();
+        glTranslatef(-15,0,0);
+        displayAlienModel(shadowMat);
+    glPopMatrix();
+    glPushMatrix();
+        glTranslatef(-30,0,0);
+        displayAlienModel(shadowMat);
+    glPopMatrix();
+    glutSwapBuffers();       //Double buffered animation
 }
 
 //---------------------------------------------------------------------
@@ -178,21 +240,48 @@ void spaceShipTimer(int val){
 	static int lastTime = 0;
     int currentTime = glutGet(GLUT_ELAPSED_TIME);
     float deltaTime = (currentTime - lastTime) / 1000.0f; // Convert milliseconds to seconds
-
     if (val < 600) {
         glutPostRedisplay();
-
-        // Adjust angle and val based on deltaTime for smoother animation
         float angleIncrement = 10.0f * deltaTime; // Adjust speed as needed
         float valIncrement = 0.1f * deltaTime;   // Adjust speed as needed
-        angle -= angleIncrement;
-        val += valIncrement;
-
-        // Wrap angle around when it reaches -360 degrees
-        if (angle <= -360) {
-            angle += 360;
+        // Adjust angle and val based on deltaTime for smoother animation
+        if (liftOff){
+            
+            liftOffHeight += 1;
+        }else {
+            
+            angle -= angleIncrement;
+            val += valIncrement;
+            // Wrap angle around when it reaches -360 degrees
+            if (angle <= -360) {
+                angle += 360;
+            }
         }
+        
+        
+        //simple timer for the animation of the aliens gun
+        if (gunTimerCounter < 40){
+            gunTimerCounter += 1;
+            theta += gunAngleIncrement;
+        } else {
+            theta += 0;
+            if (gunWait < 50){
+                gunWait += 1;
+                if (gunAngleIncrement > 0){
+                    fireBullet = (bulletVert > -7);
+                    bulletHorz += 1;
+                    bulletVert -= 0.001* gunWait * gunWait;
+                }
+            } else {
+                gunWait = 0;
+                gunAngleIncrement*=-1;
+                gunTimerCounter = 0;
+                fireBullet = false;
+                bulletHorz = 0;
+                bulletVert = 0;
+            }
 
+        }
         lastTime = currentTime;
         glutTimerFunc(16, spaceShipTimer, val); // Aim for approximately 60 frames per second (1000 ms / 60)
     }
@@ -209,6 +298,7 @@ int main(int argc, char** argv)
     glutTimerFunc(16,spaceShipTimer,0);
     glutDisplayFunc(display); 
     glutSpecialFunc(special);
+    glutKeyboardFunc(handleLiftOff);
     glutMainLoop();
     return 0;
 }

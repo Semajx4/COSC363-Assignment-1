@@ -5,9 +5,10 @@ struct Vertex {
     float x, y, z; // Position
     float s, t;    // Texture coordinates
 };
-void floor();
+void drawFloor(float size);
 void skybox(float D);
 void spaceShip();
-void spiral();
+void spiral(bool shadow);
 void loadTexture();
-void skyDome(const std::vector<Vertex>& vertices, int slices, int stacks);
+void drawSurfaceofRevolution(const std::vector<Vertex>& vertices, int slices, int stacks);
+void drawAlien(bool shadow, float theta,  bool fireBullet, float bulletHorz, float bulletVert);
