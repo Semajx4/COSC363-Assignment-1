@@ -10,7 +10,8 @@
 #include <vector>
 #include <GL/freeglut.h>
 #include <GL/gl.h>
-
+#include <climits>
+#include <list>
 #include "spaceModels.h"
 #include "loadTGA.h"
 using namespace std;
@@ -18,7 +19,7 @@ GLuint txId[10];   //Texture ids
 
 void loadTexture()				
 {
-	glGenTextures(3, txId); 	// Create 2 texture ids
+	glGenTextures(5, txId); 	// Create 2 texture ids
 
 	glBindTexture(GL_TEXTURE_2D, txId[0]); 
     loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/pano10.tga");
@@ -34,6 +35,18 @@ void loadTexture()
     loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/glass_texture1.tga");
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+
+	glBindTexture(GL_TEXTURE_2D, txId[3]);
+	loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/Glow.tga");
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+	glBindTexture(GL_TEXTURE_2D, txId[4]);  //Use this texture
+    loadTGA("/home/james/Documents/Assignment-1/363-assignment-1/dirt.tga");
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);	//Set texture parameters
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+
 
 	glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
 }
@@ -308,4 +321,63 @@ void spiral(bool shadow)
 		glEnd();
 	glPopMatrix();
 }	
+struct particle
+{
+	int t;
+	float col;
+	float size;
+	float pos[3];
+	float vel[3];
+};
 
+
+void drawParticle(float col, float size, float px, float py, float pz)
+{
+	glEnable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	glColor3f(col, col, col);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, txId[3]);
+
+	glPushMatrix();
+		glTranslatef(px, py, pz);
+		glScalef(size, size, size);
+
+		glBegin(GL_QUADS);
+		//A quad on the xy-plane
+			glTexCoord2f(0, 0);
+			glVertex3f(-0.5, -0.5, 0);
+			glTexCoord2f(1, 0);
+			glVertex3f(0.5, -0.5, 0);
+			glTexCoord2f(1, 1);
+			glVertex3f(0.5, 0.5, 0);
+			glTexCoord2f(0, 1);
+			glVertex3f(-0.5, 0.5, 0);
+
+		//A quad on the yz-plane
+			glTexCoord2f(0, 0);
+			glVertex3f(0, -0.5, -0.5);
+			glTexCoord2f(1, 0);
+			glVertex3f(0, 0.5, -0.5);
+			glTexCoord2f(1, 1);
+			glVertex3f(0, 0.5, 0.5);
+			glTexCoord2f(0, 1);
+			glVertex3f(0, -0.5, 0.5);
+		glEnd();
+	glPopMatrix();
+
+	glDisable(GL_BLEND);
+	glDisable(GL_TEXTURE_2D);
+	glEnable(GL_DEPTH_TEST);
+}
+
+void drawVolcano(){
+	glPushMatrix();
+			glRotatef(90,-1,0,0);
+			glScalef(0.9,1,0.9);
+			glColor3f(0.23, 0.24, 0.21); // Set color to white
+			GLUquadric *volc = gluNewQuadric();
+        	gluQuadricNormals(volc, GLU_SMOOTH); 
+			gluCylinder(volc,10,5*0.7,5,50,50);
+	glPopMatrix();
+}

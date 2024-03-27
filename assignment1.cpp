@@ -10,6 +10,10 @@
 #include <vector>
 #include <GL/gl.h>
 #include <stdio.h>
+#include <list>
+#include <climits>
+using namespace std;
+
 
 
 
@@ -22,6 +26,21 @@ float gunAngleIncrement = 2;
 float alienX, alienZ, modelAngle, liftOffHeight =0;
 bool fireBullet, liftOff = false;
 float bulletHorz, bulletVert = 0;
+int tick = 0;
+
+
+struct particle
+{
+	int t;
+	float col;
+	float size;
+	float pos[3];
+	float vel[3];
+};
+list<particle> particleList;
+
+
+
 std::vector<Vertex> generateDomeVertices(int slices, int stacks, float radius){
 	std::vector<Vertex> vertices;
 	for(int i =0; i <= stacks; ++i){
@@ -64,7 +83,9 @@ void initialize(void)
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
 	glClearColor (0, 0, 0, 1);
-
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+	glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
     glMatrixMode (GL_PROJECTION);
     glLoadIdentity ();
     gluPerspective(90., 1.0, 10.0, 1000.0);
@@ -92,7 +113,7 @@ void handleLiftOff(unsigned char key, int x, int y){
             break;
     }
 }
-float cam_angle = 0,look_x, look_z=-1, eye_x, eye_z = 40;  //Camera parameters
+float cam_angle = 1,look_x=1, look_z=-1, eye_x=-40, eye_z = 40;  //Camera parameters
 void special(int key, int x, int y) {
     float new_eye_x = eye_x, new_eye_z = eye_z;
     float radian_conversion = M_PI / 180.0; // Radians per degree
@@ -118,6 +139,7 @@ void special(int key, int x, int y) {
 	look_z = eye_z - 100*cos(cam_angle);
 	glutPostRedisplay();
 }
+
 void displayAlienModel(float shadowMat[16]){
     glPushMatrix();
         glPushMatrix();
@@ -156,59 +178,71 @@ void display(void)
 	glLoadIdentity();
 	float cameraHeight = 15; // Adjust the camera height as needed
 	gluLookAt(eye_x, cameraHeight, eye_z, look_x, cameraHeight, look_z, 0, 1, 0); // Adjust the eye position and look at position
-    std::vector<Vertex> skyDomeVertices = generateDomeVertices(30,30,100);
+    std::vector<Vertex> skyDomeVertices = generateDomeVertices(30,30,150);
 	glPushMatrix();
         glEnable(GL_TEXTURE_2D);
         drawSurfaceofRevolution(skyDomeVertices, 30, 30);
         glDisable(GL_TEXTURE_2D); // Disable texture mapping
 	glPopMatrix();
 
-    
     glPushMatrix();
-        if(liftOff){
-            
-            glTranslatef(0,liftOffHeight,0);
         
-            
+        if(liftOff){
+            glTranslatef(0,liftOffHeight,0);
         } 
         glRotatef(angle,0,1,0);
         glPushMatrix();
-            glTranslatef(10,30,0);
+            glEnable(GL_DEPTH_TEST);
+            glTranslatef(5,50,0);
             glLightfv(GL_LIGHT0, GL_POSITION, light);
             glLightfv(GL_LIGHT1, GL_SPOT_DIRECTION, spotDir);
             glLightfv(GL_LIGHT1, GL_POSITION, spotPosn);
             spaceShip();                //
         glPopMatrix();
     glPopMatrix();
-
         
     drawFloor(100);     //A tessellated floor plane
+    glPushMatrix();
+        glEnable(GL_DEPTH_TEST);
+        glTranslatef(90,0,-40);
+            list<particle>::iterator it;
+            for (it = particleList.begin(); it != particleList.end(); it++)
+            {
+                drawParticle(it->col, it->size, it->pos[0], it->pos[1], it->pos[2]);
+            }        
+            glPushMatrix();
+            glScalef(5,5,5);
+            drawVolcano();
+        glPopMatrix();
+    glPopMatrix();
 
     glPushMatrix();
         glPushMatrix();
-            glTranslatef(0,0.2,0);    
-            spiral(false);
+            glPushMatrix();
+                glTranslatef(0,0.2,0);    
+                spiral(false);
+            glPopMatrix();
+            glPushMatrix();
+                glTranslatef(0,0.1,0);    
+                glMultMatrixf(shadowMat);
+                glDisable(GL_LIGHTING);
+                glColor3f(0.1, 0.1, 0.1);
+                spiral(true);
+            glPopMatrix();
         glPopMatrix();
         glPushMatrix();
-            glTranslatef(0,0.1,0);    
-            glMultMatrixf(shadowMat);
-            glDisable(GL_LIGHTING);
-            glColor3f(0.1, 0.1, 0.1);
-            spiral(true);
-        glPopMatrix();
-    glPopMatrix();
-    glPushMatrix();
-        glTranslatef(13,0,1);
-        glPushMatrix();
-            glTranslatef(0,0.2,0);    
-            spiral(false);
-        glPopMatrix();
-        glPushMatrix();
-            glTranslatef(0,0.1,0);    
-            glMultMatrixf(shadowMat);
-            glDisable(GL_LIGHTING);
-            glColor3f(0.1, 0.1, 0.1);
-            spiral(true);
+            glTranslatef(13,0,1);
+            glPushMatrix();
+                glTranslatef(0,0.2,0);    
+                spiral(false);
+            glPopMatrix();
+            glPushMatrix();
+                glTranslatef(0,0.1,0);    
+                glMultMatrixf(shadowMat);
+                glDisable(GL_LIGHTING);
+                glColor3f(0.1, 0.1, 0.1);
+                spiral(true);
+            glPopMatrix();
         glPopMatrix();
     glPopMatrix();
 
@@ -235,8 +269,67 @@ void display(void)
     glutSwapBuffers();       //Double buffered animation
 }
 
+void newParticle()
+{
+	particle p = {0};
+	p.pos[0] = 4*rand()/(float) RAND_MAX-2;
+	p.pos[1] = 20;    //This point is at the top end of the smoke stack
+	p.pos[2] = 4*rand()/(float) RAND_MAX-2;
+
+	p.vel[0] = 0;
+	p.vel[1] = 0.3;
+	p.vel[2] = 0;
+
+	p.col = 1;
+	p.size = 10;
+
+	particleList.push_back(p);
+}
+
+void updateQueue()
+{
+	const int LIFETIME = 100;
+	list<particle>::iterator it;
+	particle p;
+	int tval;
+	float delta;
+	//Remove particles that have passed lifetime
+
+	if (!particleList.empty())
+	{   
+        
+		p = particleList.front();
+		if (p.t > LIFETIME) particleList.pop_front();
+        if (p.pos[1] < 1) particleList.pop_front();
+
+
+	}
+
+	for (it = particleList.begin(); it != particleList.end(); it++)
+	{
+		tval = it->t;
+		it->t = tval + 1;
+		delta = (float)tval / (float)LIFETIME;
+
+		
+		for (int i = 0; i < 3; i++)
+			(it->pos[i]) += it->vel[i];
+
+		it->size = delta  * 30 + 10;	//(5 - 25)
+		it->col = 1 - delta;		// (1 - 0)
+
+	}
+
+    if(tick % 2 == 0){
+        newParticle();   //Create a new particle every sec.
+    }
+}
+
 //---------------------------------------------------------------------
 void spaceShipTimer(int val){
+    tick++;
+    if (tick == INT_MAX) tick = 0;
+    updateQueue();
 	static int lastTime = 0;
     int currentTime = glutGet(GLUT_ELAPSED_TIME);
     float deltaTime = (currentTime - lastTime) / 1000.0f; // Convert milliseconds to seconds
