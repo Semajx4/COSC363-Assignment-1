@@ -27,6 +27,12 @@ float alienX, alienZ, modelAngle, liftOffHeight =0;
 bool fireBullet, liftOff = false;
 float bulletHorz, bulletVert = 0;
 int tick = 0;
+const float F_GRAV = 9.81;
+const float BALL_SIZE = 0.4;
+const float BALL_SCALE = 0.5;
+const float REAL_BALL_SIZE = BALL_SCALE*BALL_SIZE;
+const float BALL_INITIAL_HEIGHT = 7;
+const float VERTICAL_INCREMENT = REAL_BALL_SIZE/BALL_INITIAL_HEIGHT;
 
 
 struct particle
@@ -75,14 +81,14 @@ void initialize(void)
     glEnable(GL_LIGHT1);
     glLightfv(GL_LIGHT1, GL_DIFFUSE, white);    
 
-    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 30.0);
+    glLightf(GL_LIGHT1, GL_SPOT_CUTOFF, 20.0);
     glLightf(GL_LIGHT1, GL_SPOT_EXPONENT,0);
     glMaterialfv(GL_FRONT, GL_SPECULAR, white);
     glMaterialf(GL_FRONT,GL_SHININESS, 50);
     glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_NORMALIZE);
-	glClearColor (0, 0, 0, 1);
+	glClearColor (0.1, 0.1, 0.1, 1.0);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 	glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
@@ -164,23 +170,24 @@ void displayAlienModel(float shadowMat[16]){
 //-------------------------------------------------------------------
 void display(void)
 {
-    float light[] = {20.0f, 100.0f, 20.0f, 1.0f};  //Light's position (directly above the origin)
+    float light[] = {10,20,10,1};  //Light's position (directly above the origin)
     float spotDir[] = {1,-1,0};
-    float spotPosn[] = {10,20,10,1};
-    float shadowMat[16] = {spotPosn[1],0,0,0, -spotPosn[0],0,-spotPosn[2],-1,0,0,spotPosn[1],0,0,0,0,spotPosn[1]};
+    float spotPosn[] = {10,5,10,1};
+    float shadowMat[16] = {light[1],0,0,0, -light[0],0,-light[2],-1,0,0,light[1],0,0,0,0,light[1]};
 
     glClear (GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluPerspective(60., 0.5, 0.1, 200.); // Adjust the field of view and clipping planes
+    gluPerspective(60., 0.5, 0.1, 600.); // Adjust the field of view and clipping planes
     
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	float cameraHeight = 15; // Adjust the camera height as needed
 	gluLookAt(eye_x, cameraHeight, eye_z, look_x, cameraHeight, look_z, 0, 1, 0); // Adjust the eye position and look at position
-    std::vector<Vertex> skyDomeVertices = generateDomeVertices(30,30,150);
+    std::vector<Vertex> skyDomeVertices = generateDomeVertices(30,30,400);
 	glPushMatrix();
         glEnable(GL_TEXTURE_2D);
+        glTranslatef(eye_x, 0,eye_z);
         drawSurfaceofRevolution(skyDomeVertices, 30, 30);
         glDisable(GL_TEXTURE_2D); // Disable texture mapping
 	glPopMatrix();
@@ -201,7 +208,7 @@ void display(void)
         glPopMatrix();
     glPopMatrix();
         
-    drawFloor(100);     //A tessellated floor plane
+    drawFloor(150);     //A tessellated floor plane
     glPushMatrix();
         glEnable(GL_DEPTH_TEST);
         glTranslatef(90,0,-40);
@@ -360,10 +367,11 @@ void spaceShipTimer(int val){
             theta += 0;
             if (gunWait < 50){
                 gunWait += 1;
+                float gravTime = gunWait;
                 if (gunAngleIncrement > 0){
                     fireBullet = (bulletVert > -7);
-                    bulletHorz += 1;
-                    bulletVert -= 0.001* gunWait * gunWait;
+                    bulletHorz += 100*VERTICAL_INCREMENT;
+                    bulletVert -= VERTICAL_INCREMENT*(0.5* F_GRAV* (gravTime * gravTime));
                 }
             } else {
                 gunWait = 0;

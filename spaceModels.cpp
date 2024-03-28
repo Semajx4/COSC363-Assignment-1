@@ -54,13 +54,13 @@ void loadTexture()
 //A sky dome surface of revolution
 void drawSurfaceofRevolution(const std::vector<Vertex>& vertices, int slices, int stacks)
 {
+	glRotatef(180,0,1,0);
 	glBindTexture(GL_TEXTURE_2D, txId[0]);   //replace with a texture
 	for(int i=0; i< stacks; ++i){
 		glBegin(GL_QUAD_STRIP);
 		for(int j=0; j <= slices; ++j){
 			int index1 = i*(slices + 1) + j;
 			int index2 = (i + 1) * (slices + 1) + j;
-
 			glTexCoord2f(vertices[index1].s,  vertices[index1].t);
 			glVertex3f(vertices[index1].x,vertices[index1].y,vertices[index1].z);
 
