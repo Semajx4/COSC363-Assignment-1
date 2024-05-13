@@ -1,5 +1,6 @@
 # 363 Assignment 1
 
+This project is an assignment for a computer graphics class at UC
 
 
 ## Getting started
